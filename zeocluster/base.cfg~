@@ -1,0 +1,79 @@
+[buildout]
+parts =  
+    instance
+    zopepy
+    zopeskel
+    omelette
+
+extends = 
+    http://dist.plone.org/release/4.3.3/versions.cfg
+    versions.cfg
+
+find-links =
+    http://dist.plone.org/release/4.3.3
+    http://dist.plone.org/thirdparty
+
+extensions = 
+    mr.developer
+
+sources = sources
+auto-checkout = *
+
+versions = versions
+
+develop =
+
+effective-user = plone
+
+show-picked-versions = true
+
+environment-vars =
+    PYTHON_EGG_CACHE ${buildout:directory}/var/.python-eggs
+
+eggs =
+    Pillow
+    Plone
+    test.theme
+
+[sources]
+#package.name = scm_type scm_type://path/to/package.name
+test.theme = git https://github.com/sescatalan/test.theme
+
+
+[instance]
+recipe = plone.recipe.zope2instance
+user = admin:admin
+http-address = 8080
+debug-mode = off
+verbose-security = on
+blob-storage = var/blobstorage
+
+eggs =
+    ${buildout:eggs}
+
+zcml = 
+
+environment-vars =
+    PTS_LANGUAGES en
+
+
+[zopepy]
+recipe = zc.recipe.egg
+eggs = ${instance:eggs}
+interpreter = zopepy
+scripts = zopepy
+
+
+# create ZopeSkel and paster commands with dexterity support
+[zopeskel]
+recipe = zc.recipe.egg
+eggs =
+    ${instance:eggs}
+    ZopeSkel < 3.0dev
+    PasteScript
+    zopeskel.dexterity
+
+
+[omelette]
+recipe = collective.recipe.omelette
+eggs = ${instance:eggs}
